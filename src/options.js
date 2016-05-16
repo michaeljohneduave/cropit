@@ -89,6 +89,12 @@ const options = {
       default: 'min',
     },
     {
+      name: 'maxFileSize',
+      type: 'number',
+      description: `Determines the allowed max size of the image being loaded.`,
+      default: false,
+    },
+    {
       name: 'freeMove',
       type: 'boolean',
       description: 'When set to true, you can freely move the image instead of being bound to the container borders',

@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-import Zoomer from './Zoomer';
+import Zoomer from './zoomer';
 import { CLASS_NAMES, ERRORS, EVENTS } from './constants';
 import { loadDefaults } from './options';
 import { exists, round } from './utils';
@@ -137,15 +137,21 @@ class Cropit {
 
   loadFile(file) {
     const fileReader = new FileReader();
-    if (file && file.type.match('image')) {
+    const withinSize = this.checkFileSize(file);
+
+    if (file && file.type.match('image') && withinSize) {
       fileReader.readAsDataURL(file);
       fileReader.onload = this.onFileReaderLoaded.bind(this);
       fileReader.onerror = this.onFileReaderError.bind(this);
     }
-    else if (file) {
+    else if (file && !withinSize) {
+      this.onFileSizeError();
+    } else if (file) {
       this.onFileReaderError();
     }
   }
+
+  check
 
   onFileReaderLoaded(e) {
     this.loadImage(e.target.result);
@@ -369,6 +375,18 @@ class Cropit {
   enableZoomSlider() {
     this.$zoomSlider.removeAttr('disabled');
     this.options.onZoomEnabled();
+  }
+
+  checkFileSize(file) {
+    if (this.options.maxFileSize && (file != null ? file.size : void 0) > this.options.maxFileSize) {
+      return false;
+    }
+
+    return true;
+  }
+
+  onFileSizeError() {
+    return typeof this.options.onFileSizeError === "function" ? this.options.onFileSizeError() : void 0;
   }
 
   disableZoomSlider() {

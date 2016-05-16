@@ -172,9 +172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Zoomer = __webpack_require__(3);
+	var _zoomer = __webpack_require__(3);
 
-	var _Zoomer2 = _interopRequireDefault(_Zoomer);
+	var _zoomer2 = _interopRequireDefault(_zoomer);
 
 	var _constants = __webpack_require__(4);
 
@@ -268,7 +268,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.moveContinue = false;
 
-	      this.zoomer = new _Zoomer2['default']();
+	      this.zoomer = new _zoomer2['default']();
 
 	      if (this.options.allowDragNDrop) {
 	        _jquery2['default'].event.props.push('dataTransfer');
@@ -313,10 +313,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'loadFile',
 	    value: function loadFile(file) {
 	      var fileReader = new FileReader();
-	      if (file && file.type.match('image')) {
+	      var withinSize = this.checkFileSize(file);
+
+	      if (file && file.type.match('image') && withinSize) {
 	        fileReader.readAsDataURL(file);
 	        fileReader.onload = this.onFileReaderLoaded.bind(this);
 	        fileReader.onerror = this.onFileReaderError.bind(this);
+	      } else if (file && !withinSize) {
+	        this.onFileSizeError();
 	      } else if (file) {
 	        this.onFileReaderError();
 	      }
@@ -559,6 +563,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function enableZoomSlider() {
 	      this.$zoomSlider.removeAttr('disabled');
 	      this.options.onZoomEnabled();
+	    }
+	  }, {
+	    key: 'checkFileSize',
+	    value: function checkFileSize(file) {
+	      if (this.options.maxFileSize && (file != null ? file.size : void 0) > this.options.maxFileSize) {
+	        return false;
+	      }
+
+	      return true;
+	    }
+	  }, {
+	    key: 'onFileSizeError',
+	    value: function onFileSizeError() {
+	      return typeof this.options.onFileSizeError === 'function' ? this.options.onFileSizeError() : void 0;
 	    }
 	  }, {
 	    key: 'disableZoomSlider',
@@ -1092,6 +1110,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    type: 'string',
 	    description: 'Determines the zoom when an image is loaded.\n        When set to `\'min\'`, image is zoomed to the smallest when loaded.\n        When set to `\'image\'`, image is zoomed to 100% when loaded.',
 	    'default': 'min'
+	  }, {
+	    name: 'maxFileSize',
+	    type: 'number',
+	    description: 'Determines the allowed max size of the image being loaded.',
+	    'default': false
 	  }, {
 	    name: 'freeMove',
 	    type: 'boolean',
